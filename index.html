@@ -25,7 +25,7 @@
 
         h1 {
             color: #ff2e63;
-            font-size: 40px;
+            font-size: 32px;
         }
 
         button {
@@ -65,7 +65,7 @@
         }
 
         img {
-            width: 300px;
+            width: 280px;
             border-radius: 15px;
         }
     </style>
@@ -73,14 +73,17 @@
 <body>
 
 <div class="container">
-    <h1>I Love You ❤️</h1>
+    <h1>
+        Happy Birthday muahhh! 🎂💋<br>
+        so will u give me real kiss when u will come ? ❤️
+    </h1>
 
     <button id="yes" onclick="yesClicked()">YES 😍</button>
     <button id="no" onmouseover="moveNo()">NO 😏</button>
 
     <div id="meme">
         <h2>Yayyy! 💖</h2>
-        <img src="https://i.imgflip.com/4/30b1gx.jpg" alt="Love Meme">
+        <img src="https://gifdb.com/images/high/cute-chibi-lick-and-kiss-oe66nci7rck1yyrm.webp" alt="Cute Love GIF">
     </div>
 </div>
 
@@ -88,24 +91,22 @@
     const noBtn = document.getElementById("no");
 
     function moveNo() {
-        const x = Math.random() * (window.innerWidth - 100);
-        const y = Math.random() * (window.innerHeight - 50);
+        const x = Math.random() * (window.innerWidth - 120);
+        const y = Math.random() * (window.innerHeight - 80);
         noBtn.style.left = x + "px";
         noBtn.style.top = y + "px";
     }
 
     function yesClicked() {
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 12; i++) {
             let boom = document.createElement("div");
             boom.className = "boom";
             boom.innerHTML = "🎉";
             boom.style.left = Math.random() * window.innerWidth + "px";
             boom.style.top = Math.random() * window.innerHeight + "px";
             document.body.appendChild(boom);
-
             setTimeout(() => boom.remove(), 1000);
         }
-
         document.getElementById("meme").style.display = "block";
     }
 </script>
