@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>I Love You ❤️</title>
+
+<style>
+body{
+    height:100vh;
+    margin:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(135deg,#ff9a9e,#fad0c4);
+    font-family:Arial,sans-serif;
+    overflow:hidden;
+}
+.container{
+    text-align:center;
+}
+img{
+    width:280px;
+    border-radius:20px;
+    animation:bounce 1s infinite alternate;
+}
+@keyframes bounce{
+    from{transform:scale(1);}
+    to{transform:scale(1.1);}
+}
+.heart{
+    position:fixed;
+    font-size:30px;
+    animation:fall 4s linear infinite;
+}
+@keyframes fall{
+    from{top:-10%;}
+    to{top:110%;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>Yayyy 💖💖</h1>
+    <img src="https://gifdb.com/images/high/cute-chibi-lick-and-kiss-oe66nci7rck1yyrm.webp">
+</div>
+
+<script>
+setInterval(()=>{
+    let h=document.createElement("div");
+    h.className="heart";
+    h.innerHTML="❤️";
+    h.style.left=Math.random()*window.innerWidth+"px";
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),4000);
+},300);
+</script>
+
+</body>
+</html>
