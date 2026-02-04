@@ -18,35 +18,31 @@ body{
   position:relative;display:inline-block;border-radius:18px;overflow:hidden;
   box-shadow:0 0 30px rgba(255,46,99,.7)
 }
-video,canvas{
-  width:420px;height:320px;object-fit:cover
-}
+video,canvas{width:420px;height:320px;object-fit:cover}
 .frame{
   position:absolute;inset:0;border:12px solid #ff2e63;border-radius:18px;
   pointer-events:none
 }
-.hb{
-  font-size:36px;color:#ff2e63;margin:14px 0
+#count{
+  position:absolute;inset:0;display:flex;justify-content:center;align-items:center;
+  font-size:96px;background:rgba(0,0,0,.4)
 }
-.gifs img{
-  width:120px;margin:6px;border-radius:12px
-}
-#msg{margin-bottom:10px;font-size:18px}
+.hb{font-size:36px;color:#ff2e63;margin:14px 0}
+.gifs img{width:120px;margin:6px;border-radius:12px}
+#result{display:none}
 </style>
 </head>
 
 <body>
-
 <div class="wrap">
-  <div id="msg">Look at the camera 😊</div>
-
   <div class="videoBox">
     <video id="v" autoplay playsinline></video>
     <canvas id="c" style="display:none"></canvas>
     <div class="frame"></div>
+    <div id="count" style="display:none">3</div>
   </div>
 
-  <div id="result" style="display:none">
+  <div id="result">
     <div class="hb">Happy Birthday 🎉🎂</div>
     <div class="gifs">
       <img src="https://media.giphy.com/media/26FPpSuhgHvYo9Kyk/giphy.gif">
@@ -59,52 +55,60 @@ video,canvas{
 <script>
 const v = document.getElementById('v');
 const c = document.getElementById('c');
-const msg = document.getElementById('msg');
+const count = document.getElementById('count');
 const res = document.getElementById('result');
 
-let captured = false;
+let started=false, captured=false;
 
 // Camera ON
 navigator.mediaDevices.getUserMedia({video:true})
   .then(s => v.srcObject = s);
 
 // Face Detection
-const faceDetection = new FaceDetection({
+const fd = new FaceDetection({
   locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/${f}`
 });
-faceDetection.setOptions({
-  model: 'short',
-  minDetectionConfidence: 0.6
-});
+fd.setOptions({ model:'short', minDetectionConfidence:0.4 });
 
-faceDetection.onResults(r => {
-  if (r.detections.length > 0 && !captured) {
-    captured = true;
-    autoSnap();
+fd.onResults(r=>{
+  if(r.detections.length>0 && !started && !captured){
+    started=true;
+    startCountdown();
   }
 });
 
 const cam = new Camera(v,{
-  onFrame: async () => await faceDetection.send({image:v}),
-  width:420,
-  height:320
+  onFrame: async()=> fd.send({image:v}),
+  width:420,height:320
 });
 cam.start();
 
-// Auto photo click
-function autoSnap(){
-  msg.innerText = "Perfect! 🎉";
-  c.width = v.videoWidth;
-  c.height = v.videoHeight;
-  const ctx = c.getContext('2d');
-  ctx.drawImage(v,0,0,c.width,c.height);
+// 3 → 2 → 1 → SNAP
+function startCountdown(){
+  let n=3;
+  count.style.display='flex';
+  count.textContent=n;
+  const id=setInterval(()=>{
+    n--;
+    if(n>0){
+      count.textContent=n;
+    }else{
+      clearInterval(id);
+      count.style.display='none';
+      snap();
+    }
+  },1000);
+}
 
-  // Switch to photo
+// Auto capture
+function snap(){
+  captured=true;
+  c.width=v.videoWidth; c.height=v.videoHeight;
+  c.getContext('2d').drawImage(v,0,0,c.width,c.height);
   v.style.display='none';
   c.style.display='block';
   res.style.display='block';
 }
 </script>
-
 </body>
 </html>
