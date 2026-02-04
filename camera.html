@@ -3,6 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <title>Birthday Surprise 🎂</title>
+
+<!-- Face detection -->
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/face_detection.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+
 <style>
 body{
   margin:0;height:100vh;display:flex;justify-content:center;align-items:center;
@@ -10,34 +15,30 @@ body{
 }
 .wrap{width:900px;max-width:95%;text-align:center}
 .videoBox{
-  position:relative;display:inline-block;border-radius:16px;overflow:hidden;
-  box-shadow:0 0 30px rgba(255,46,99,.6)
+  position:relative;display:inline-block;border-radius:18px;overflow:hidden;
+  box-shadow:0 0 30px rgba(255,46,99,.7)
 }
 video,canvas{
   width:420px;height:320px;object-fit:cover
 }
 .frame{
-  position:absolute;inset:0;border:10px solid #ff2e63;border-radius:16px;
+  position:absolute;inset:0;border:12px solid #ff2e63;border-radius:18px;
   pointer-events:none
 }
-.controls{margin:14px}
-button{
-  padding:10px 28px;border:0;border-radius:30px;
-  background:#ff2e63;color:#fff;font-size:16px;cursor:pointer
-}
-.result{display:none;margin-top:16px}
 .hb{
-  font-size:34px;color:#ff2e63;margin:10px 0
+  font-size:36px;color:#ff2e63;margin:14px 0
 }
 .gifs img{
   width:120px;margin:6px;border-radius:12px
 }
+#msg{margin-bottom:10px;font-size:18px}
 </style>
 </head>
+
 <body>
 
 <div class="wrap">
-  <h2>Smile 😄 — Click your Birthday Photo</h2>
+  <div id="msg">Look at the camera 😊</div>
 
   <div class="videoBox">
     <video id="v" autoplay playsinline></video>
@@ -45,11 +46,7 @@ button{
     <div class="frame"></div>
   </div>
 
-  <div class="controls">
-    <button onclick="snap()">📸 Click Photo</button>
-  </div>
-
-  <div class="result" id="res">
+  <div id="result" style="display:none">
     <div class="hb">Happy Birthday 🎉🎂</div>
     <div class="gifs">
       <img src="https://media.giphy.com/media/26FPpSuhgHvYo9Kyk/giphy.gif">
@@ -62,25 +59,52 @@ button{
 <script>
 const v = document.getElementById('v');
 const c = document.getElementById('c');
-const res = document.getElementById('res');
+const msg = document.getElementById('msg');
+const res = document.getElementById('result');
+
+let captured = false;
 
 // Camera ON
 navigator.mediaDevices.getUserMedia({video:true})
   .then(s => v.srcObject = s);
 
-// Click photo + frame
-function snap(){
+// Face Detection
+const faceDetection = new FaceDetection({
+  locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/${f}`
+});
+faceDetection.setOptions({
+  model: 'short',
+  minDetectionConfidence: 0.6
+});
+
+faceDetection.onResults(r => {
+  if (r.detections.length > 0 && !captured) {
+    captured = true;
+    autoSnap();
+  }
+});
+
+const cam = new Camera(v,{
+  onFrame: async () => await faceDetection.send({image:v}),
+  width:420,
+  height:320
+});
+cam.start();
+
+// Auto photo click
+function autoSnap(){
+  msg.innerText = "Perfect! 🎉";
   c.width = v.videoWidth;
   c.height = v.videoHeight;
   const ctx = c.getContext('2d');
   ctx.drawImage(v,0,0,c.width,c.height);
 
-  // show captured photo instead of video
+  // Switch to photo
   v.style.display='none';
   c.style.display='block';
-
   res.style.display='block';
 }
 </script>
+
 </body>
 </html>
